@@ -76,6 +76,11 @@ public class DictionaryApp extends JFrame {
             e.printStackTrace();
         }
 
+
+        // Sử dụng GridBagConstraints để bố trí giao diện
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(5, 5, 5, 5); // Padding giữa các thành phần
+
         // Cài đặt JFrame
         setTitle("Dictionary");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -83,20 +88,6 @@ public class DictionaryApp extends JFrame {
         setLayout(new GridBagLayout());
         setLocationRelativeTo(null); // Hiển thị giữa màn hình
 
-        // Sử dụng GridBagConstraints để bố trí giao diện
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(5, 5, 5, 5); // Padding giữa các thành phần
-
-        // 1.1 Thanh tìm kiếm từ
-        searchField = new JTextField(20); // Replaced with standard JTextField
-        // trigger searchButton when Enter key is pressed
-        searchField.addActionListener(e -> searchButton.doClick());
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        gbc.gridwidth = 1;
-        gbc.weightx = 0.3;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        add(searchField, gbc);
 
         // 1.2 Thanh tìm kiếm định nghĩa
         searchDefinitionField = new JTextField(20); // Replaced with standard JTextField
@@ -108,6 +99,17 @@ public class DictionaryApp extends JFrame {
         gbc.weightx = 0.7;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         add(searchDefinitionField, gbc);
+
+        // 1.1 Thanh tìm kiếm từ
+        searchField = new JTextField(20); // Replaced with standard JTextField
+        // trigger searchButton when Enter key is pressed
+        searchField.addActionListener(e -> searchButton.doClick());
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.gridwidth = 1;
+        gbc.weightx = 0.3;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        add(searchField, gbc);
 
         // 2. Danh sách từ
         String[] words = slangWords.keySet().toArray(new String[0]);
@@ -132,18 +134,6 @@ public class DictionaryApp extends JFrame {
         gbc.weighty = 1.0;
         add(listScrollPane, gbc);
 
-        // 3. Khu vực hiển thị nội dung
-        contentArea = new JTextArea();
-        contentArea.setEditable(false);
-        JScrollPane contentScrollPane = new JScrollPane(contentArea);
-        contentScrollPane.setPreferredSize(new Dimension(400, 300));
-        gbc.gridx = 1;
-        gbc.gridy = 1;
-        gbc.gridwidth = 3;
-        gbc.gridheight = 3;
-        gbc.weightx = 0.7;
-        gbc.weighty = 0.7;
-        add(contentScrollPane, gbc);
 
         // 4. Các nút chức năng
         JPanel buttonPanel = new JPanel(new GridLayout(1, 3, 10, 10));
@@ -171,6 +161,20 @@ public class DictionaryApp extends JFrame {
                 }
             }
         });
+        // 3. Khu vực hiển thị nội dung
+        contentArea = new JTextArea();
+        contentArea.setEditable(false);
+        JScrollPane contentScrollPane = new JScrollPane(contentArea);
+        contentScrollPane.setPreferredSize(new Dimension(400, 300));
+        gbc.gridx = 1;
+        gbc.gridy = 1;
+        gbc.gridwidth = 3;
+        gbc.gridheight = 3;
+        gbc.weightx = 0.7;
+        gbc.weighty = 0.7;
+        add(contentScrollPane, gbc);
+
+
         editButton = new JButton("Edit");
         editButton.addActionListener(e -> {
             // enter slang word and check exist using JOptionPane
