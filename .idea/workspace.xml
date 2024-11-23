@@ -5,11 +5,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="6b04acd3-04cb-4df1-b963-6a4a6b055a18" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/uiDesigner.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/slang.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/DictionaryApp.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Main.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modified_slang.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/DictionaryApp.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/DictionaryApp.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -44,6 +42,7 @@
     &quot;Application.HomeUI.executor&quot;: &quot;Run&quot;,
     &quot;Application.LeftPanel.executor&quot;: &quot;Run&quot;,
     &quot;Application.Main.executor&quot;: &quot;Run&quot;,
+    &quot;Application.QuizExample.executor&quot;: &quot;Run&quot;,
     &quot;Application.SearchPanel.executor&quot;: &quot;Run&quot;,
     &quot;Application.SlangDictionaryApp.executor&quot;: &quot;Run&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
@@ -108,7 +107,10 @@
       <workItem from="1732070216985" duration="8046000" />
       <workItem from="1732089722311" duration="9654000" />
       <workItem from="1732104378478" duration="2816000" />
-      <workItem from="1732107225356" duration="3991000" />
+      <workItem from="1732107225356" duration="5147000" />
+      <workItem from="1732171651622" duration="1524000" />
+      <workItem from="1732199701989" duration="8214000" />
+      <workItem from="1732261213442" duration="2000" />
     </task>
     <servers />
   </component>

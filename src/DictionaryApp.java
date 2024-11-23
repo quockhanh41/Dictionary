@@ -135,7 +135,7 @@ public class DictionaryApp extends JFrame {
         add(listScrollPane, gbc);
 
 
-        // 4. Các nút chức năng
+        // 4. nút add
         JPanel buttonPanel = new JPanel(new GridLayout(1, 3, 10, 10));
         addButton = new JButton("Add");
         // open new frame to add new slang word and definition using 2 text fields in a JOptionPane
@@ -147,12 +147,33 @@ public class DictionaryApp extends JFrame {
             panel.add(slangField);
             panel.add(new JLabel("Definition:"));
             panel.add(definitionField);
+            // Nếu slang words trùng thì thông báo cho người dùng, confirm có overwrite hay duplicate ra 1 slang word mới.
             int result = JOptionPane.showConfirmDialog(this, panel, "Add new slang word", JOptionPane.OK_CANCEL_OPTION);
             if (result == JOptionPane.OK_OPTION) {
                 String slang = slangField.getText();
                 String definition = definitionField.getText();
-                if (!slang.isEmpty() && !definition.isEmpty()) {
+                if (slangWords.containsKey(slang)) {
+                    int overwrite = JOptionPane.showConfirmDialog(this, "Slang word already exists. Overwrite?", "Warning", JOptionPane.YES_NO_OPTION);
+                    if (overwrite == JOptionPane.YES_OPTION) {
+                        slangWords.put(slang, definition);
+                        // delete line containing old slang word and definition, then add new slang word and definition
+                        try (BufferedReader reader = new BufferedReader(new FileReader(modifiedFilePath));
+                             FileWriter writer = new FileWriter(modifiedFilePath)) {
+                            String line;
+                            while ((line = reader.readLine()) != null) {
+                                String[] parts = line.split("`", 2);
+                                if (parts.length == 2 && !parts[0].equals(slang)) {
+                                    writer.write(line + "\n");
+                                }
+                            }
+                            writer.write(slang + "`" + definition + "\n");
+                        } catch (IOException ex) {
+                            ex.printStackTrace();
+                        }
+                    }
+                } else {
                     slangWords.put(slang, definition);
+                    // add new slang word and definition to the end of file
                     try (FileWriter writer = new FileWriter(modifiedFilePath, true)) {
                         writer.write(slang + "`" + definition + "\n");
                     } catch (IOException ex) {
@@ -160,6 +181,8 @@ public class DictionaryApp extends JFrame {
                     }
                 }
             }
+
+
         });
         // 3. Khu vực hiển thị nội dung
         contentArea = new JTextArea();
@@ -240,6 +263,28 @@ public class DictionaryApp extends JFrame {
 
         // 5. Nút Reset
         resetButton = new JButton("Reset");
+        // Chức năng reset danh sách slang words gốc từ file slang.txt.
+        resetButton.addActionListener(e -> {
+            try (BufferedReader reader = new BufferedReader(new FileReader(filePath));
+                 FileWriter writer = new FileWriter(modifiedFilePath)) {
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    writer.write(line + "\n");
+                }
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+            slangWords.clear();
+            try {
+                loadSlangWords();
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+            String[] newWords = slangWords.keySet().toArray(new String[0]);
+            wordList.setListData(newWords);
+            contentArea.setText("");
+            searchField.setText("");
+        });
         gbc.gridx = 4;
         gbc.gridy = 4;
         gbc.gridwidth = 1;
@@ -249,8 +294,47 @@ public class DictionaryApp extends JFrame {
 
         // 6. Các nút chức năng khác (Random, Quiz, History)
         JPanel rightPanel = new JPanel(new GridLayout(3, 1, 5, 5));
+
+        //Chức năng random 1 slang word (On this day slang word). hiển thị trong JOptionPane
         randomButton = new JButton("Random");
+        randomButton.addActionListener(e -> {
+            int randomIndex = (int) (Math.random() * slangWords.size());
+            String randomSlang = slangWords.keySet().toArray(new String[0])[randomIndex];
+            String randomDefinition = slangWords.get(randomSlang);
+            JOptionPane.showMessageDialog(this, randomSlang + ": " + randomDefinition, "Random slang word", JOptionPane.INFORMATION_MESSAGE);
+        });
+        //show 1 random slang word with 4 random definition including correct definition for user choose usinig JOptionPane
         quizButton = new JButton("Quiz");
+        quizButton.addActionListener(e -> {
+            int randomIndex = (int) (Math.random() * slangWords.size());
+            String randomSlang = slangWords.keySet().toArray(new String[0])[randomIndex];
+            String randomDefinition = slangWords.get(randomSlang);
+            List<String> randomDefinitions = new ArrayList<>();
+            randomDefinitions.add(randomDefinition);
+            while (randomDefinitions.size() < 4) {
+                int randomIndex2 = (int) (Math.random() * slangWords.size());
+                String randomDefinition2 = slangWords.get(slangWords.keySet().toArray(new String[0])[randomIndex2]);
+                if (!randomDefinitions.contains(randomDefinition2)) {
+                    randomDefinitions.add(randomDefinition2);
+                }
+            }
+            // randomize randomDefinitions
+            for (int i = 0; i < randomDefinitions.size(); i++) {
+                int randomIndex2 = (int) (Math.random() * randomDefinitions.size());
+                String temp = randomDefinitions.get(i);
+                randomDefinitions.set(i, randomDefinitions.get(randomIndex2));
+                randomDefinitions.set(randomIndex2, temp);
+            }
+            String[] options = randomDefinitions.toArray(new String[0]);
+
+            int result = JOptionPane.showOptionDialog(this,"What is definition of " + randomSlang + "?", "Quiz", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
+            if (randomDefinitions.get(result).equals(randomDefinition)) {
+                JOptionPane.showMessageDialog(this, "Correct!", "Result", JOptionPane.INFORMATION_MESSAGE);
+            } else {
+                JOptionPane.showMessageDialog(this, "Incorrect! Correct answer: " + randomDefinition, "Result", JOptionPane.INFORMATION_MESSAGE);
+            }
+        });
+
         historyButton = new JButton("History");
         rightPanel.add(randomButton);
         rightPanel.add(quizButton);
@@ -268,6 +352,7 @@ public class DictionaryApp extends JFrame {
         searchButton.addActionListener(e -> {
             String slang = searchField.getText();
             String definition = searchDefinitionField.getText();
+            contentArea.setText("");
             if (!slang.isEmpty()) {
                 String result = searchBySlang(slang);
                 if (result.equals("Not found.")) {
