@@ -261,36 +261,6 @@ public class DictionaryApp extends JFrame {
         gbc.fill = GridBagConstraints.HORIZONTAL;
         add(buttonPanel, gbc);
 
-        // 5. Nút Reset
-        resetButton = new JButton("Reset");
-        // Chức năng reset danh sách slang words gốc từ file slang.txt.
-        resetButton.addActionListener(e -> {
-            try (BufferedReader reader = new BufferedReader(new FileReader(filePath));
-                 FileWriter writer = new FileWriter(modifiedFilePath)) {
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    writer.write(line + "\n");
-                }
-            } catch (IOException ex) {
-                ex.printStackTrace();
-            }
-            slangWords.clear();
-            try {
-                loadSlangWords();
-            } catch (IOException ex) {
-                ex.printStackTrace();
-            }
-            String[] newWords = slangWords.keySet().toArray(new String[0]);
-            wordList.setListData(newWords);
-            contentArea.setText("");
-            searchField.setText("");
-        });
-        gbc.gridx = 4;
-        gbc.gridy = 4;
-        gbc.gridwidth = 1;
-        gbc.weightx = 0.0;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        add(resetButton, gbc);
 
         // 6. Các nút chức năng khác (Random, Quiz, History)
         JPanel rightPanel = new JPanel(new GridLayout(3, 1, 5, 5));
@@ -334,6 +304,39 @@ public class DictionaryApp extends JFrame {
                 JOptionPane.showMessageDialog(this, "Incorrect! Correct answer: " + randomDefinition, "Result", JOptionPane.INFORMATION_MESSAGE);
             }
         });
+
+        // 5. Nút Reset
+        resetButton = new JButton("Reset");
+        // Chức năng reset danh sách slang words gốc từ file slang.txt.
+        resetButton.addActionListener(e -> {
+            try (BufferedReader reader = new BufferedReader(new FileReader(filePath));
+                 FileWriter writer = new FileWriter(modifiedFilePath)) {
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    writer.write(line + "\n");
+                }
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+            slangWords.clear();
+            try {
+                loadSlangWords();
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+            String[] newWords = slangWords.keySet().toArray(new String[0]);
+            wordList.setListData(newWords);
+            contentArea.setText("");
+            searchField.setText("");
+        });
+        gbc.gridx = 4;
+        gbc.gridy = 4;
+        gbc.gridwidth = 1;
+        gbc.weightx = 0.0;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        add(resetButton, gbc);
+
+
 
         historyButton = new JButton("History");
         rightPanel.add(randomButton);
