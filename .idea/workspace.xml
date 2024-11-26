@@ -4,7 +4,13 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6b04acd3-04cb-4df1-b963-6a4a6b055a18" name="Changes" comment="" />
+    <list default="true" id="6b04acd3-04cb-4df1-b963-6a4a6b055a18" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/src/old.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modified_slang.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/DictionaryApp.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/DictionaryApp.java" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -108,6 +114,8 @@
       <workItem from="1732199701989" duration="8214000" />
       <workItem from="1732261213442" duration="2000" />
       <workItem from="1732334159200" duration="107000" />
+      <workItem from="1732373278207" duration="82000" />
+      <workItem from="1732631527300" duration="8371000" />
     </task>
     <servers />
   </component>

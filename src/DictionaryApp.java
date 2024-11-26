@@ -1,4 +1,5 @@
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.io.*;
 import java.util.ArrayList;
@@ -6,53 +7,24 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+
 public class DictionaryApp extends JFrame {
-    Map<String, String> slangWords = new HashMap<>();
-    final String filePath = "slang.txt";
-    final String modifiedFilePath = "modified_slang.txt";
-    JTextArea contentArea;
-    JTextField searchDefinitionField;
-    JScrollPane listScrollPane;
-    JTextField searchField;
-    JButton addButton;
-    JButton editButton;
-    JButton deleteButton;
-    JButton resetButton;
-    JButton randomButton;
-    JButton quizButton;
-    JButton historyButton;
-    JButton searchButton;
+    private Map<String, String> slangWords = new HashMap<>();
+    private final String filePath = "slang.txt";
+    private final String modifiedFilePath = "modified_slang.txt";
 
-    // Load dữ liệu từ file
-    public void loadSlangWords() throws IOException {
-        BufferedReader reader = new BufferedReader(new FileReader(modifiedFilePath));
-        String line;
-        while ((line = reader.readLine()) != null) {
-            String[] parts = line.split("`", 2);
-            if (parts.length == 2) {
-                slangWords.put(parts[0], parts[1]);
-            }
-        }
-        reader.close();
-    }
+    private JTextField searchField, searchDefinitionField;
+    private JTextArea contentArea;
+    private JList<String> wordList;
+    private JScrollPane listScrollPane;
 
-    // Tìm kiếm theo từ lóng
-    public String searchBySlang(String slang) {
-        return slangWords.getOrDefault(slang, "Not found.");
-    }
-
-    // Tìm kiếm theo định nghĩa
-    public List<String> searchByDefinition(String definition) {
-        List<String> results = new ArrayList<>();
-        for (Map.Entry<String, String> entry : slangWords.entrySet()) {
-            if (entry.getValue().toLowerCase().contains(definition.toLowerCase())) {
-                results.add(entry.getKey());
-            }
-        }
-        return results;
-    }
 
     public DictionaryApp() {
+        setTitle("Slang Dictionary");
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setSize(900, 600);
+        setLayout(new BorderLayout());
+        setLocationRelativeTo(null);
 
         // Check if modifiedFilePath doesn't exist, then create it by copying from filePath
         try {
@@ -76,239 +48,439 @@ public class DictionaryApp extends JFrame {
             e.printStackTrace();
         }
 
+        // Main Tabbed Pane
+        JTabbedPane tabbedPane = new JTabbedPane();
 
-        // Sử dụng GridBagConstraints để bố trí giao diện
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(5, 5, 5, 5); // Padding giữa các thành phần
+        // Search Panel
+        JPanel searchPanel = createSearchPanel();
+        tabbedPane.addTab("Search", searchPanel);
 
-        // Cài đặt JFrame
-        setTitle("Dictionary");
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(800, 600);
-        setLayout(new GridBagLayout());
-        setLocationRelativeTo(null); // Hiển thị giữa màn hình
+        // Random and Quiz Panel
+        JPanel randomQuizPanel = createRandomQuizPanel();
+        tabbedPane.addTab("Fun Zone", randomQuizPanel);
 
+        // History Panel
+        JPanel historyPanel = new JPanel();
+        historyPanel.setLayout(new BorderLayout());
+        historyPanel.add(new JLabel("History functionality coming soon!", SwingConstants.CENTER), BorderLayout.CENTER);
+        tabbedPane.addTab("History", historyPanel);
 
-        // 1.2 Thanh tìm kiếm định nghĩa
-        searchDefinitionField = new JTextField(20); // Replaced with standard JTextField
-        // trigger searchButton when Enter key is pressed
-        searchDefinitionField.addActionListener(e -> searchButton.doClick());
-        gbc.gridx = 1;
-        gbc.gridy = 0;
-        gbc.gridwidth = 3;
-        gbc.weightx = 0.7;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        add(searchDefinitionField, gbc);
+        add(tabbedPane, BorderLayout.CENTER);
+    }
 
-        // 1.1 Thanh tìm kiếm từ
-        searchField = new JTextField(20); // Replaced with standard JTextField
-        // trigger searchButton when Enter key is pressed
-        searchField.addActionListener(e -> searchButton.doClick());
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        gbc.gridwidth = 1;
-        gbc.weightx = 0.3;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        add(searchField, gbc);
+    private JPanel createSearchPanel() {
+        JPanel panel = new JPanel(new BorderLayout(10, 10));
+        panel.setBorder(new EmptyBorder(10, 10, 10, 10));
 
-        // 2. Danh sách từ
-        String[] words = slangWords.keySet().toArray(new String[0]);
-        JList<String> wordList = new JList<>(words);
-        wordList.setFont(new Font("Arial", Font.PLAIN, 16));
-        listScrollPane = new JScrollPane(wordList); // Updated JScrollPane
-        // display clicked word's definition in contentArea
-        wordList.addListSelectionListener(e -> {
-            String slang = wordList.getSelectedValue();
-            String definition = slangWords.get(slang);
-            if (definition != null) {
-                contentArea.setText(definition);
-            }
-        });
-//        wordList.addListSelectionListener(e -> searchField.setText(wordList.getSelectedValue()));
-        gbc.gridx = 0;
-        gbc.gridy = 1;
-        gbc.gridwidth = 1;
-        gbc.gridheight = 5;
-        gbc.fill = GridBagConstraints.BOTH;
-        gbc.weightx = 0.3;
-        gbc.weighty = 1.0;
-        add(listScrollPane, gbc);
+        // Top Search Bar
+        JPanel searchBar = new JPanel(new GridLayout(1, 3, 10, 10));
+        searchField = new JTextField();
+        searchField.setFont(new Font("Arial", Font.PLAIN, 16));
+        searchField.setBorder(BorderFactory.createTitledBorder("Search by Slang"));
+        searchBar.add(searchField);
 
+        searchDefinitionField = new JTextField();
+        searchDefinitionField.setFont(new Font("Arial", Font.PLAIN, 16));
+        searchDefinitionField.setBorder(BorderFactory.createTitledBorder("Search by Definition"));
+        searchBar.add(searchDefinitionField);
 
-        // 4. nút add
-        JPanel buttonPanel = new JPanel(new GridLayout(1, 3, 10, 10));
-        addButton = new JButton("Add");
-        // open new frame to add new slang word and definition using 2 text fields in a JOptionPane
-        addButton.addActionListener(e -> {
-            JTextField slangField = new JTextField();
-            JTextField definitionField = new JTextField();
-            JPanel panel = new JPanel(new GridLayout(2, 2, 5, 5));
-            panel.add(new JLabel("Slang:"));
-            panel.add(slangField);
-            panel.add(new JLabel("Definition:"));
-            panel.add(definitionField);
-            // Nếu slang words trùng thì thông báo cho người dùng, confirm có overwrite hay duplicate ra 1 slang word mới.
-            int result = JOptionPane.showConfirmDialog(this, panel, "Add new slang word", JOptionPane.OK_CANCEL_OPTION);
-            if (result == JOptionPane.OK_OPTION) {
-                String slang = slangField.getText();
-                String definition = definitionField.getText();
-                if (slangWords.containsKey(slang)) {
-                    int overwrite = JOptionPane.showConfirmDialog(this, "Slang word already exists. Overwrite?", "Warning", JOptionPane.YES_NO_OPTION);
-                    if (overwrite == JOptionPane.YES_OPTION) {
-                        slangWords.put(slang, definition);
-                        // delete line containing old slang word and definition, then add new slang word and definition
-                        try (BufferedReader reader = new BufferedReader(new FileReader(modifiedFilePath));
-                             FileWriter writer = new FileWriter(modifiedFilePath)) {
-                            String line;
-                            while ((line = reader.readLine()) != null) {
-                                String[] parts = line.split("`", 2);
-                                if (parts.length == 2 && !parts[0].equals(slang)) {
-                                    writer.write(line + "\n");
-                                }
-                            }
-                            writer.write(slang + "`" + definition + "\n");
-                        } catch (IOException ex) {
-                            ex.printStackTrace();
-                        }
-                    }
-                } else {
-                    slangWords.put(slang, definition);
-                    // add new slang word and definition to the end of file
-                    try (FileWriter writer = new FileWriter(modifiedFilePath, true)) {
-                        writer.write(slang + "`" + definition + "\n");
-                    } catch (IOException ex) {
-                        ex.printStackTrace();
-                    }
-                }
-            }
+        JButton searchButton = new JButton("Search");
+        searchButton.setFont(new Font("Arial", Font.BOLD, 16));
+        searchButton.setBackground(new Color(59, 89, 182));
+        searchButton.setForeground(Color.WHITE);
+        searchButton.setFocusPainted(false);
+        searchButton.setToolTipText("Click to search");
+        searchButton.addActionListener(e -> performSearch());
+        searchBar.add(searchButton);
 
+        panel.add(searchBar, BorderLayout.NORTH);
 
-        });
-        // 3. Khu vực hiển thị nội dung
-        contentArea = new JTextArea();
-        contentArea.setEditable(false);
-        JScrollPane contentScrollPane = new JScrollPane(contentArea);
-        contentScrollPane.setPreferredSize(new Dimension(400, 300));
-        gbc.gridx = 1;
-        gbc.gridy = 1;
-        gbc.gridwidth = 3;
-        gbc.gridheight = 3;
-        gbc.weightx = 0.7;
-        gbc.weighty = 0.7;
-        add(contentScrollPane, gbc);
+        // Word List and Content Area
+        JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, createWordListPane(), createContentPane());
+        splitPane.setDividerLocation(300);
+        panel.add(splitPane, BorderLayout.CENTER);
 
+        // Bottom Buttons
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 10));
+        JButton addButton = new JButton("Add");
+        JButton editButton = new JButton("Edit");
+        JButton deleteButton = new JButton("Delete");
+        JButton resetButton = new JButton("Reset");
 
-        editButton = new JButton("Edit");
-        editButton.addActionListener(e -> {
-            // enter slang word and check exist using JOptionPane
-            JTextField slangField = new JTextField();
-            JPanel panel = new JPanel(new GridLayout(1, 2, 5, 5));
-            panel.add(new JLabel("Slang:"));
-            panel.add(slangField);
-            int result = JOptionPane.showConfirmDialog(this, panel, "Edit slang word", JOptionPane.OK_CANCEL_OPTION);
-            // if slang word exists, open new frame to edit definition
-            // display slang and definition in 4 labels using JOptionPane
-            if (result == JOptionPane.OK_OPTION) {
-                String slang = slangField.getText();
-                String definition = slangWords.get(slang);
-                if (definition != null) {
+        addButton.setFont(new Font("Arial", Font.PLAIN, 16));
+        editButton.setFont(new Font("Arial", Font.PLAIN, 16));
+        deleteButton.setFont(new Font("Arial", Font.PLAIN, 16));
+        resetButton.setFont(new Font("Arial", Font.PLAIN, 16));
 
-                    JTextField newDefinitionField = new JTextField(definition);
-                    JTextField newSlangField = new JTextField(slang);
-                    JPanel editPanel = new JPanel(new GridLayout(2, 2, 5, 5));
-                    editPanel.add(new JLabel("Slang:"));
-                    editPanel.add(newDefinitionField);
-                    editPanel.add(new JLabel("Definition:"));
-                    editPanel.add(newSlangField);
-                    int editResult = JOptionPane.showConfirmDialog(this, editPanel, "Edit definition", JOptionPane.OK_CANCEL_OPTION);
-                    if (editResult == JOptionPane.OK_OPTION) {
-                        String newSlang = newSlangField.getText();
-                        String newDefinition = newDefinitionField.getText();
-                        // delete old slang word and definition, then add new slang word and definition
-                        slangWords.remove(slang);
-                        slangWords.put(newSlang, newDefinition);
-                        // delete line containing old slang word and definition, then add new slang word and definition
-                        try (BufferedReader reader = new BufferedReader(new FileReader(modifiedFilePath));
-                             FileWriter writer = new FileWriter(modifiedFilePath)) {
-                            String line;
-                            while ((line = reader.readLine()) != null) {
-                                String[] parts = line.split("`", 2);
-                                if (parts.length == 2 && !parts[0].equals(slang)) {
-                                    writer.write(line + "\n");
-                                }
-                            }
-                            writer.write(newSlang + "`" + newDefinition + "\n");
-                        } catch (IOException ex) {
-                            ex.printStackTrace();
-                        }
+        addButton.addActionListener(e -> addSlangWord());
+        editButton.addActionListener(e -> editSlangWord());
+        deleteButton.addActionListener(e -> deleteSlangWord());
+        resetButton.addActionListener(e -> resetDictionary());
 
-                    }
-                }
-            }
-
-        });
-
-
-        deleteButton = new JButton("Delete");
         buttonPanel.add(addButton);
         buttonPanel.add(editButton);
         buttonPanel.add(deleteButton);
-        gbc.gridx = 1;
-        gbc.gridy = 4;
-        gbc.gridwidth = 3;
-        gbc.gridheight = 1;
-        gbc.weighty = 0.0;
+        buttonPanel.add(resetButton);
+
+        panel.add(buttonPanel, BorderLayout.SOUTH);
+
+        return panel;
+    }
+
+    private JPanel createRandomQuizPanel() {
+        JPanel panel = new JPanel(new BorderLayout(10, 10));
+        panel.setBorder(new EmptyBorder(10, 10, 10, 10));
+
+        JButton randomButton = new JButton("Random Word");
+        randomButton.setFont(new Font("Arial", Font.BOLD, 16));
+        randomButton.setBackground(new Color(59, 89, 182));
+        randomButton.setForeground(Color.WHITE);
+        randomButton.setFocusPainted(false);
+        randomButton.addActionListener(e -> showRandomWord());
+
+        JButton quizButton = new JButton("Take a Quiz");
+        quizButton.setFont(new Font("Arial", Font.BOLD, 16));
+        quizButton.setBackground(new Color(46, 204, 113));
+        quizButton.setForeground(Color.WHITE);
+        quizButton.setFocusPainted(false);
+        quizButton.addActionListener(e -> startQuiz());
+
+        JPanel buttonPanel = new JPanel(new GridLayout(1, 2, 20, 10));
+        buttonPanel.add(randomButton);
+        buttonPanel.add(quizButton);
+
+        panel.add(buttonPanel, BorderLayout.CENTER);
+
+        return panel;
+    }
+
+    private JPanel createWordListPane() {
+        JPanel panel = new JPanel(new BorderLayout(10, 10));
+        panel.setBorder(BorderFactory.createTitledBorder("Slang Words"));
+
+        wordList = new JList<>(slangWords.keySet().toArray(new String[0]));
+        wordList.setFont(new Font("Arial", Font.PLAIN, 16));
+        wordList.addListSelectionListener(e -> {
+            String selectedSlang = wordList.getSelectedValue();
+            if (selectedSlang != null) {
+                contentArea.setText(slangWords.get(selectedSlang));
+            }
+        });
+
+        listScrollPane = new JScrollPane(wordList);
+        panel.add(listScrollPane, BorderLayout.CENTER);
+
+        return panel;
+    }
+
+    private JPanel createContentPane() {
+        JPanel panel = new JPanel(new BorderLayout(10, 10));
+        panel.setBorder(BorderFactory.createTitledBorder("Definition"));
+
+        contentArea = new JTextArea();
+        contentArea.setFont(new Font("Arial", Font.PLAIN, 16));
+        contentArea.setEditable(false);
+
+        JScrollPane scrollPane = new JScrollPane(contentArea);
+        panel.add(scrollPane, BorderLayout.CENTER);
+
+        return panel;
+    }
+
+    private void performSearch() {
+        String slang = searchField.getText();
+        String definition = searchDefinitionField.getText();
+
+        if (!slang.isEmpty()) {
+            String result = slangWords.getOrDefault(slang, "Not found.");
+            contentArea.setText(result);
+        } else if (!definition.isEmpty()) {
+            List<String> results = searchByDefinition(definition);
+            wordList.setListData(results.toArray(new String[0]));
+        }
+    }
+
+    private List<String> searchByDefinition(String definition) {
+        List<String> results = new ArrayList<>();
+        for (Map.Entry<String, String> entry : slangWords.entrySet()) {
+            if (entry.getValue().toLowerCase().contains(definition.toLowerCase())) {
+                results.add(entry.getKey());
+            }
+        }
+        return results;
+    }
+
+    // Load dữ liệu từ file
+    public void loadSlangWords() throws IOException {
+        BufferedReader reader = new BufferedReader(new FileReader(modifiedFilePath));
+        String line;
+        while ((line = reader.readLine()) != null) {
+            String[] parts = line.split("`", 2);
+            if (parts.length == 2) {
+                slangWords.put(parts[0], parts[1]);
+            }
+        }
+        reader.close();
+    }
+
+    private void addSlangWord() {
+        // Create a custom dialog panel with better alignment and spacing
+        JPanel panel = new JPanel(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(10, 10, 10, 10);
         gbc.fill = GridBagConstraints.HORIZONTAL;
-        add(buttonPanel, gbc);
 
+        // Add "Slang" label and text field
+        JLabel slangLabel = new JLabel("Slang:");
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        panel.add(slangLabel, gbc);
 
-        // 6. Các nút chức năng khác (Random, Quiz, History)
-        JPanel rightPanel = new JPanel(new GridLayout(3, 1, 5, 5));
+        JTextField slangField = new JTextField(20);
+        gbc.gridx = 1;
+        gbc.gridy = 0;
+        panel.add(slangField, gbc);
 
-        //Chức năng random 1 slang word (On this day slang word). hiển thị trong JOptionPane
-        randomButton = new JButton("Random");
-        randomButton.addActionListener(e -> {
-            int randomIndex = (int) (Math.random() * slangWords.size());
-            String randomSlang = slangWords.keySet().toArray(new String[0])[randomIndex];
-            String randomDefinition = slangWords.get(randomSlang);
-            JOptionPane.showMessageDialog(this, randomSlang + ": " + randomDefinition, "Random slang word", JOptionPane.INFORMATION_MESSAGE);
-        });
-        //show 1 random slang word with 4 random definition including correct definition for user choose usinig JOptionPane
-        quizButton = new JButton("Quiz");
-        quizButton.addActionListener(e -> {
-            int randomIndex = (int) (Math.random() * slangWords.size());
-            String randomSlang = slangWords.keySet().toArray(new String[0])[randomIndex];
-            String randomDefinition = slangWords.get(randomSlang);
-            List<String> randomDefinitions = new ArrayList<>();
-            randomDefinitions.add(randomDefinition);
-            while (randomDefinitions.size() < 4) {
-                int randomIndex2 = (int) (Math.random() * slangWords.size());
-                String randomDefinition2 = slangWords.get(slangWords.keySet().toArray(new String[0])[randomIndex2]);
-                if (!randomDefinitions.contains(randomDefinition2)) {
-                    randomDefinitions.add(randomDefinition2);
+        // Add "Definition" label and text field
+        JLabel definitionLabel = new JLabel("Definition:");
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        panel.add(definitionLabel, gbc);
+
+        JTextField definitionField = new JTextField(20);
+        gbc.gridx = 1;
+        gbc.gridy = 1;
+        panel.add(definitionField, gbc);
+
+        // Show dialog for adding a slang word
+        int result = JOptionPane.showConfirmDialog(null, panel, "Add New Slang Word", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+
+        // Process the result of the dialog
+        if (result == JOptionPane.OK_OPTION) {
+            String slang = slangField.getText().trim();
+            String definition = definitionField.getText().trim();
+
+            if (slang.isEmpty() || definition.isEmpty()) {
+                JOptionPane.showMessageDialog(null, "Both fields must be filled!", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            if (slangWords.containsKey(slang)) {
+                // Warn the user if the slang already exists
+                int overwrite = JOptionPane.showConfirmDialog(null, "Slang word already exists. Overwrite?", "Warning", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+
+                if (overwrite == JOptionPane.YES_OPTION) {
+                    slangWords.put(slang, definition);
+
+                    // Update the file by overwriting the existing slang word
+                    try (BufferedReader reader = new BufferedReader(new FileReader(modifiedFilePath)); FileWriter writer = new FileWriter(modifiedFilePath)) {
+                        String line;
+                        while ((line = reader.readLine()) != null) {
+                            String[] parts = line.split("`", 2);
+                            if (parts.length == 2 && !parts[0].equals(slang)) {
+                                writer.write(line + "\n");
+                            }
+                        }
+                        writer.write(slang + "`" + definition + "\n");
+                    } catch (IOException ex) {
+                        JOptionPane.showMessageDialog(null, "Error updating slang file.", "Error", JOptionPane.ERROR_MESSAGE);
+                        ex.printStackTrace();
+                    }
                 }
-            }
-            // randomize randomDefinitions
-            for (int i = 0; i < randomDefinitions.size(); i++) {
-                int randomIndex2 = (int) (Math.random() * randomDefinitions.size());
-                String temp = randomDefinitions.get(i);
-                randomDefinitions.set(i, randomDefinitions.get(randomIndex2));
-                randomDefinitions.set(randomIndex2, temp);
-            }
-            String[] options = randomDefinitions.toArray(new String[0]);
-
-            int result = JOptionPane.showOptionDialog(this,"What is definition of " + randomSlang + "?", "Quiz", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
-            if (randomDefinitions.get(result).equals(randomDefinition)) {
-                JOptionPane.showMessageDialog(this, "Correct!", "Result", JOptionPane.INFORMATION_MESSAGE);
             } else {
-                JOptionPane.showMessageDialog(this, "Incorrect! Correct answer: " + randomDefinition, "Result", JOptionPane.INFORMATION_MESSAGE);
-            }
-        });
+                // Add the new slang word
+                slangWords.put(slang, definition);
 
-        // 5. Nút Reset
-        resetButton = new JButton("Reset");
-        // Chức năng reset danh sách slang words gốc từ file slang.txt.
-        resetButton.addActionListener(e -> {
+                try (FileWriter writer = new FileWriter(modifiedFilePath, true)) {
+                    writer.write(slang + "`" + definition + "\n");
+                } catch (IOException ex) {
+                    JOptionPane.showMessageDialog(null, "Error saving slang file.", "Error", JOptionPane.ERROR_MESSAGE);
+                    ex.printStackTrace();
+                }
+
+                JOptionPane.showMessageDialog(null, "Slang word added successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
+            }
+        }
+    }
+
+    private void editSlangWord() {
+        // Create a custom dialog to input the slang word
+        JPanel panel = new JPanel(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(10, 10, 10, 10);
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+
+        JLabel slangLabel = new JLabel("Slang:");
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        panel.add(slangLabel, gbc);
+
+        JTextField slangField = new JTextField(20);
+        gbc.gridx = 1;
+        gbc.gridy = 0;
+        panel.add(slangField, gbc);
+
+        // Show dialog for entering slang word
+        int result = JOptionPane.showConfirmDialog(null, panel, "Edit Slang Word", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+
+        // If slang word exists, prompt for new definition
+        if (result == JOptionPane.OK_OPTION) {
+            String slang = slangField.getText().trim();
+
+            // Check if the slang word exists in the dictionary
+            String definition = slangWords.get(slang);
+            if (definition != null) {
+                // Create an edit panel with pre-filled definition
+                JTextField newSlangField = new JTextField(slang);
+                JTextField newDefinitionField = new JTextField(definition);
+
+                JPanel editPanel = new JPanel(new GridBagLayout());
+                GridBagConstraints editGbc = new GridBagConstraints();
+                editGbc.insets = new Insets(10, 10, 10, 10);
+                editGbc.fill = GridBagConstraints.HORIZONTAL;
+
+                // Add labels and text fields for editing
+                JLabel editSlangLabel = new JLabel("Slang:");
+                editGbc.gridx = 0;
+                editGbc.gridy = 0;
+                editPanel.add(editSlangLabel, editGbc);
+
+                editGbc.gridx = 1;
+                editPanel.add(newSlangField, editGbc);
+
+                JLabel editDefinitionLabel = new JLabel("Definition:");
+                editGbc.gridx = 0;
+                editGbc.gridy = 1;
+                editPanel.add(editDefinitionLabel, editGbc);
+
+                editGbc.gridx = 1;
+                editPanel.add(newDefinitionField, editGbc);
+
+                // Show dialog to edit the slang word's definition
+                int editResult = JOptionPane.showConfirmDialog(null, editPanel, "Edit Slang Definition", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+
+                // If the user confirms, update the slang word and definition
+                if (editResult == JOptionPane.OK_OPTION) {
+                    String newSlang = newSlangField.getText().trim();
+                    String newDefinition = newDefinitionField.getText().trim();
+
+                    // Validate the inputs
+                    if (newSlang.isEmpty() || newDefinition.isEmpty()) {
+                        JOptionPane.showMessageDialog(null, "Both fields must be filled!", "Error", JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
+
+                    // Remove the old slang word and add the updated one
+                    slangWords.remove(slang);
+                    slangWords.put(newSlang, newDefinition);
+
+                    // Update the file by deleting the old slang word and definition, then adding the new one
+                    try (BufferedReader reader = new BufferedReader(new FileReader(modifiedFilePath))) {
+                        List<String> lines = new ArrayList<>();
+                        String line;
+                        while ((line = reader.readLine()) != null) {
+                            String[] parts = line.split("`", 2);
+                            if (parts.length == 2 && !parts[0].equals(slang)) {
+                                lines.add(line);
+                            }
+                        }
+                        lines.add(newSlang + "`" + newDefinition);
+
+                        try (FileWriter writer = new FileWriter(modifiedFilePath)) {
+                            for (String l : lines) {
+                                writer.write(l + "\n");
+                            }
+                        }
+                    } catch (IOException ex) {
+                        JOptionPane.showMessageDialog(null, "Error updating slang file.", "Error", JOptionPane.ERROR_MESSAGE);
+                        ex.printStackTrace();
+                    }
+
+                    // Inform the user that the slang word was successfully updated
+                    JOptionPane.showMessageDialog(null, "Slang word updated successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
+                }
+            } else {
+                JOptionPane.showMessageDialog(null, "Slang word not found.", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    }
+    private void deleteSlangWord() {
+        // Create a text field for slang input with a more aesthetically pleasing design
+        JTextField slangField = new JTextField();
+        slangField.setPreferredSize(new Dimension(200, 30));  // Adjust the size to fit the dialog nicely
+
+        // Create a panel with a better layout
+        JPanel panel = new JPanel(new GridBagLayout());
+        panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10)); // Add padding around the panel
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        panel.add(new JLabel("Enter Slang Word: "), gbc);
+
+        gbc.gridx = 1;
+        gbc.gridy = 0;
+        panel.add(slangField, gbc);
+
+        // Show the dialog with improved layout and better UI elements
+        int result = JOptionPane.showConfirmDialog(this, panel, "Delete Slang Word", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+
+        if (result == JOptionPane.OK_OPTION) {
+            String slang = slangField.getText().trim();  // Trim whitespace to avoid issues
+
+            if (slangWords.containsKey(slang)) {
+                // Ask user for confirmation with a better confirmation dialog
+                int confirmDelete = JOptionPane.showConfirmDialog(this,
+                        "<html><b>Are you sure you want to delete the slang word: <font color='red'>" + slang + "</font>?</b></html>",
+                        "Confirm Deletion",
+                        JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+
+                if (confirmDelete == JOptionPane.YES_OPTION) {
+                    // Remove the slang word from the dictionary
+                    slangWords.remove(slang);
+
+                    // Read the file contents into a list while excluding the deleted slang word
+                    List<String> lines = new ArrayList<>();
+                    try (BufferedReader reader = new BufferedReader(new FileReader(modifiedFilePath))) {
+                        String line;
+                        while ((line = reader.readLine()) != null) {
+                            String[] parts = line.split("`", 2);
+                            if (parts.length == 2 && !parts[0].equals(slang)) {
+                                lines.add(line);
+                            }
+                        }
+                    } catch (IOException ex) {
+                        ex.printStackTrace();
+                    }
+
+                    // Write the updated contents back to the file
+                    try (FileWriter writer = new FileWriter(modifiedFilePath)) {
+                        for (String line : lines) {
+                            writer.write(line + "\n");
+                        }
+                    } catch (IOException ex) {
+                        ex.printStackTrace();
+                    }
+
+                    // Notify user of successful deletion with a nice confirmation dialog
+                    JOptionPane.showMessageDialog(this, "<html><b>Slang word <font color='green'>" + slang + "</font> deleted successfully!</b></html>",
+                            "Success", JOptionPane.INFORMATION_MESSAGE);
+                }
+            } else {
+                // If slang word doesn't exist, notify the user in a clearer way
+                JOptionPane.showMessageDialog(this, "<html><b>Slang word <font color='red'>" + slang + "</font> not found!</b></html>",
+                        "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    }
+
+
+    private void resetDictionary() {
+        // Ask user for confirmation before resetting the dictionary
+        int confirmReset = JOptionPane.showConfirmDialog(this,
+                "<html><b>Are you sure you want to reset the dictionary to its original state?</b></html>",
+                "Confirm Reset", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+
+        if (confirmReset == JOptionPane.YES_OPTION) {
             try (BufferedReader reader = new BufferedReader(new FileReader(filePath));
                  FileWriter writer = new FileWriter(modifiedFilePath)) {
                 String line;
@@ -318,67 +490,44 @@ public class DictionaryApp extends JFrame {
             } catch (IOException ex) {
                 ex.printStackTrace();
             }
+
+            // Clear the current slangWords dictionary
             slangWords.clear();
+
             try {
+                // Load the slang words again after reset
                 loadSlangWords();
             } catch (IOException ex) {
                 ex.printStackTrace();
             }
+
+            // Update the word list display
             String[] newWords = slangWords.keySet().toArray(new String[0]);
             wordList.setListData(newWords);
+
+            // Clear the content area and search field
             contentArea.setText("");
             searchField.setText("");
-        });
-        gbc.gridx = 4;
-        gbc.gridy = 4;
-        gbc.gridwidth = 1;
-        gbc.weightx = 0.0;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        add(resetButton, gbc);
+
+            // Notify user that the dictionary has been reset successfully
+            JOptionPane.showMessageDialog(this,
+                    "<html><b>Dictionary has been reset to its original state!</b></html>",
+                    "Reset Successful", JOptionPane.INFORMATION_MESSAGE);
+        } else {
+            // If user cancels the reset action
+            JOptionPane.showMessageDialog(this,
+                    "<html><b>Dictionary reset has been cancelled.</b></html>",
+                    "Reset Cancelled", JOptionPane.INFORMATION_MESSAGE);
+        }
+    }
 
 
+    private void showRandomWord() {
+        // Implement Random Word functionality here.
+    }
 
-        historyButton = new JButton("History");
-        rightPanel.add(randomButton);
-        rightPanel.add(quizButton);
-        rightPanel.add(historyButton);
-        gbc.gridx = 4;
-        gbc.gridy = 1;
-        gbc.gridwidth = 1;
-        gbc.gridheight = 3;
-        gbc.fill = GridBagConstraints.BOTH;
-        add(rightPanel, gbc);
-
-        // 1.3 Nút tìm kiếm
-        searchButton = new JButton("Search");
-        searchButton.setFont(new Font("Arial", Font.PLAIN, 16));
-        searchButton.addActionListener(e -> {
-            String slang = searchField.getText();
-            String definition = searchDefinitionField.getText();
-            contentArea.setText("");
-            if (!slang.isEmpty()) {
-                String result = searchBySlang(slang);
-                if (result.equals("Not found.")) {
-                    JOptionPane.showMessageDialog(this, "No definition found.", "Message", JOptionPane.INFORMATION_MESSAGE);
-                } else contentArea.setText(result);
-            } else if (!definition.isEmpty()) {
-                List<String> results = searchByDefinition(definition);
-                if (results.isEmpty()) {
-                    JOptionPane.showMessageDialog(this, "No slang found.", "Message", JOptionPane.INFORMATION_MESSAGE);
-                } else {
-                    // display in JScrollPane listScrollPane
-                    JList<String> resultList = new JList<>(results.toArray(new String[0]));
-                    resultList.setFont(new Font("Arial", Font.PLAIN, 16));
-                    listScrollPane.setViewportView(resultList);
-                }
-            }
-        });
-        gbc.gridx = 4;
-        gbc.gridy = 0;
-        gbc.gridwidth = 1;
-        gbc.weightx = 0.1;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        add(searchButton, gbc);
+    private void startQuiz() {
+        // Implement Quiz functionality here.
     }
 
     public static void main(String[] args) {
