@@ -10,7 +10,7 @@ public class DictionaryApp extends JFrame {
     private Map<String, String> slangWords = new HashMap<>();
     private final String filePath = "slang.txt";
     private final String modifiedFilePath = "modified_slang.txt";
-
+    private final String historyFilePath = "history.txt";
     private JTextField searchField, searchDefinitionField;
     private JTextArea contentArea;
     private JList<String> wordList;
@@ -23,6 +23,15 @@ public class DictionaryApp extends JFrame {
         setSize(900, 600);
         setLayout(new BorderLayout());
         setLocationRelativeTo(null);
+
+        // check if historyFilePath exists, then delete all its data
+        try {
+            FileWriter writer = new FileWriter(historyFilePath);
+            writer.write("");
+            writer.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         // Check if modifiedFilePath doesn't exist, then create it by copying from filePath
         try {
@@ -61,8 +70,16 @@ public class DictionaryApp extends JFrame {
         // History Panel
         JPanel historyPanel = new JPanel();
         historyPanel.setLayout(new BorderLayout());
-        historyPanel.add(new JLabel("History functionality coming soon!", SwingConstants.CENTER), BorderLayout.CENTER);
+//        historyPanel.add(new JLabel("History functionality coming soon!", SwingConstants.CENTER), BorderLayout.CENTER);
+        // read history.txt file and display the content in the panel
+        // add listener to run showSlangHistoryInPanel() when the History tab is selected
+        tabbedPane.addChangeListener(e -> {
+            if (tabbedPane.getSelectedIndex() == 2) {
+                showSlangHistoryInPanel(historyPanel);
+            }
+        });
         tabbedPane.addTab("History", historyPanel);
+
 
         add(tabbedPane, BorderLayout.CENTER);
     }
@@ -139,16 +156,24 @@ public class DictionaryApp extends JFrame {
         randomButton.setFocusPainted(false);
         randomButton.addActionListener(e -> showRandomWord());
 
-        JButton quizButton = new JButton("Take a Quiz");
+        JButton quizButton = new JButton("Take a Quiz with Definitions");
         quizButton.setFont(new Font("Arial", Font.BOLD, 16));
         quizButton.setBackground(new Color(46, 204, 113));
         quizButton.setForeground(Color.WHITE);
         quizButton.setFocusPainted(false);
         quizButton.addActionListener(e -> startQuiz());
 
-        JPanel buttonPanel = new JPanel(new GridLayout(1, 2, 20, 10));
+        JButton slangQuizButton = new JButton("Take a Quiz with Slang Words");
+        slangQuizButton.setFont(new Font("Arial", Font.BOLD, 16));
+        slangQuizButton.setBackground(new Color(231, 76, 60));
+        slangQuizButton.setForeground(Color.WHITE);
+        slangQuizButton.setFocusPainted(false);
+        slangQuizButton.addActionListener(e -> startSlangQuiz());
+
+        JPanel buttonPanel = new JPanel(new GridLayout(1, 3, 20, 10));
         buttonPanel.add(randomButton);
         buttonPanel.add(quizButton);
+        buttonPanel.add(slangQuizButton);
 
         panel.add(buttonPanel, BorderLayout.CENTER);
 
@@ -644,11 +669,115 @@ public class DictionaryApp extends JFrame {
 
             quizPanel.add(Box.createVerticalStrut(10));  // Add space between options
         }
+        // Show the custom panel in a dialog box
+        JOptionPane.showConfirmDialog(this, quizPanel, "Slang Quiz", JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE);
+    }
+
+    private void startSlangQuiz() {
+        // Select a random definition from the dictionary
+        int randomIndex = (int) (Math.random() * slangWords.size());
+        String randomSlang = slangWords.keySet().toArray(new String[0])[randomIndex];
+        String randomDefinition = slangWords.get(randomSlang);
+
+        // Prepare 4 random slang words (including the correct one)
+        List<String> randomSlangs = new ArrayList<>();
+        randomSlangs.add(randomSlang);
+        while (randomSlangs.size() < 4) {
+            int randomIndex2 = (int) (Math.random() * slangWords.size());
+            String randomSlang2 = slangWords.keySet().toArray(new String[0])[randomIndex2];
+            if (!randomSlangs.contains(randomSlang2)) {
+                randomSlangs.add(randomSlang2);
+            }
+        }
+
+        // Shuffle the options to randomize the order of the slang words
+        Collections.shuffle(randomSlangs);
+
+        // Create a custom JPanel to display the question and options
+        JPanel quizPanel = new JPanel();
+        quizPanel.setLayout(new BoxLayout(quizPanel, BoxLayout.Y_AXIS));
+        quizPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20)); // Padding around the panel
+
+        // Question label
+        JLabel questionLabel = new JLabel("Which slang word means: " + randomDefinition + "?");
+        questionLabel.setFont(new Font("Arial", Font.BOLD, 20));
+        questionLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        quizPanel.add(questionLabel);
+
+        quizPanel.add(Box.createVerticalStrut(20));  // Space between question and options
+
+        // Option buttons with padding around each
+        List<JButton> optionButtons = new ArrayList<>();
+        for (String option : randomSlangs) {
+            JButton optionButton = new JButton(option);
+            optionButton.setFont(new Font("Arial", Font.PLAIN, 16));
+            optionButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+            optionButton.setPreferredSize(new Dimension(500, 40));
+
+            // Add padding to each button by setting margins
+            optionButton.setMargin(new Insets(10, 20, 10, 20)); // Top, Left, Bottom, Right padding
+
+            // Add action listener to handle answer selection
+            optionButton.addActionListener(event -> {
+                // Check if the selected answer is correct
+                if (option.equals(randomSlang)) {
+                    optionButton.setBackground(Color.GREEN); // Correct answer
+                } else {
+                    optionButton.setBackground(Color.RED);  // Incorrect answer, red background
+                    optionButtons.stream()
+                            .filter(button -> button.getText().equals(randomSlang))
+                            .findFirst()
+                            .ifPresent(button -> button.setBackground(Color.GREEN)); // Highlight correct answer
+                }
+
+                // Disable all options after an answer is selected
+                optionButtons.forEach(button -> button.setEnabled(false));
+            });
+
+            // Add the button to the panel
+            quizPanel.add(optionButton);
+            optionButtons.add(optionButton);
+
+            quizPanel.add(Box.createVerticalStrut(10));  // Add space between options
+        }
 
         // Show the custom panel in a dialog box
-        int result = JOptionPane.showConfirmDialog(this, quizPanel, "Slang Quiz", JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE);
+        JOptionPane.showConfirmDialog(this, quizPanel, "Slang Quiz", JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE);
+    }
 
+    // Function to display history in the given JPanel (historyPanel)
+    private void showSlangHistoryInPanel(JPanel historyPanel) {
+        // Read the history.txt file and get the content
+        StringBuilder historyContent = new StringBuilder();
+        String historyFilePath = "history.txt";  // Adjust the file path if necessary
 
+        try (BufferedReader reader = new BufferedReader(new FileReader(historyFilePath))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                historyContent.append(line).append("\n");  // Add each line from history.txt
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Error reading history file.", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+
+        // Create a JTextArea to display the history content
+        JTextArea historyTextArea = new JTextArea();
+        historyTextArea.setText(historyContent.toString());
+        historyTextArea.setEditable(false);  // Make it read-only
+        historyTextArea.setFont(new Font("Arial", Font.PLAIN, 14));  // Optional: Customize font
+
+        // Wrap the JTextArea inside a JScrollPane
+        JScrollPane scrollPane = new JScrollPane(historyTextArea);
+        scrollPane.setPreferredSize(new Dimension(450, 300));  // Set the preferred size of the scrollable area
+
+        // Clear any previous components and add the scrollPane to the historyPanel
+        historyPanel.removeAll();
+        historyPanel.add(scrollPane, BorderLayout.CENTER);
+
+        // Revalidate and repaint the panel to reflect the changes
+        historyPanel.revalidate();
+        historyPanel.repaint();
     }
 
     public static void main(String[] args) {
