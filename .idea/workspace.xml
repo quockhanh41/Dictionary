@@ -5,9 +5,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="6b04acd3-04cb-4df1-b963-6a4a6b055a18" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/src/addSlangWord.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/history.txt" beforeDir="false" afterPath="$PROJECT_DIR$/history.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/DictionaryApp.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/DictionaryApp.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/old.java" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -113,11 +114,29 @@
       <workItem from="1732261213442" duration="2000" />
       <workItem from="1732334159200" duration="107000" />
       <workItem from="1732373278207" duration="82000" />
-      <workItem from="1732631527300" duration="13013000" />
+      <workItem from="1732631527300" duration="13162000" />
+      <workItem from="1732782008424" duration="612000" />
+      <workItem from="1732782743461" duration="1064000" />
+      <workItem from="1732817059263" duration="346000" />
     </task>
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="java-method">
+          <url>file://$PROJECT_DIR$/src/DictionaryApp.java</url>
+          <line>597</line>
+          <properties class="DictionaryApp" method="startSlangQuiz">
+            <option name="EMULATED" value="true" />
+            <option name="WATCH_EXIT" value="false" />
+          </properties>
+          <option name="timeStamp" value="1" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
 </project>
