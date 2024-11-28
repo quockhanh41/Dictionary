@@ -7,9 +7,9 @@ import java.util.List;
 
 
 public class DictionaryApp extends JFrame {
-    private Map<String, String> slangWords = new HashMap<>();
+    private static Map<String, String> slangWords = new HashMap<>();
     private final String filePath = "slang.txt";
-    private final String modifiedFilePath = "modified_slang.txt";
+    private static final String modifiedFilePath = "modified_slang.txt";
     private final String historyFilePath = "history.txt";
     private JTextField searchField, searchDefinitionField;
     private JTextArea contentArea;
@@ -132,8 +132,8 @@ public class DictionaryApp extends JFrame {
 
         addButton.addActionListener(e -> new addSlangWord(slangWords, modifiedFilePath));
         editButton.addActionListener(e -> new editSlangWord(slangWords, modifiedFilePath));
-        deleteButton.addActionListener(e -> deleteSlangWord());
-        resetButton.addActionListener(e -> resetDictionary());
+        deleteButton.addActionListener(e -> new deleteSlangWord(slangWords, modifiedFilePath));
+        resetButton.addActionListener(e -> new resetDictionary( slangWords, wordList, contentArea, searchField, filePath, modifiedFilePath));
 
         buttonPanel.add(addButton);
         buttonPanel.add(editButton);
@@ -246,7 +246,7 @@ public class DictionaryApp extends JFrame {
     }
 
     // Load dữ liệu từ file
-    public void loadSlangWords() throws IOException {
+    public static void loadSlangWords() throws IOException {
         BufferedReader reader = new BufferedReader(new FileReader(modifiedFilePath));
         String line;
         while ((line = reader.readLine()) != null) {
@@ -259,125 +259,6 @@ public class DictionaryApp extends JFrame {
     }
 
 
-
-
-
-    private void deleteSlangWord() {
-        // Create a text field for slang input with a more aesthetically pleasing design
-        JTextField slangField = new JTextField();
-        slangField.setPreferredSize(new Dimension(200, 30));  // Adjust the size to fit the dialog nicely
-
-        // Create a panel with a better layout
-        JPanel panel = new JPanel(new GridBagLayout());
-        panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10)); // Add padding around the panel
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        panel.add(new JLabel("Enter Slang Word: "), gbc);
-
-        gbc.gridx = 1;
-        gbc.gridy = 0;
-        panel.add(slangField, gbc);
-
-        // Show the dialog with improved layout and better UI elements
-        int result = JOptionPane.showConfirmDialog(this, panel, "Delete Slang Word", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
-
-        if (result == JOptionPane.OK_OPTION) {
-            String slang = slangField.getText().trim();  // Trim whitespace to avoid issues
-
-            if (slangWords.containsKey(slang)) {
-                // Ask user for confirmation with a better confirmation dialog
-                int confirmDelete = JOptionPane.showConfirmDialog(this,
-                        "<html><b>Are you sure you want to delete the slang word: <font color='red'>" + slang + "</font>?</b></html>",
-                        "Confirm Deletion",
-                        JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
-
-                if (confirmDelete == JOptionPane.YES_OPTION) {
-                    // Remove the slang word from the dictionary
-                    slangWords.remove(slang);
-
-                    // Read the file contents into a list while excluding the deleted slang word
-                    List<String> lines = new ArrayList<>();
-                    try (BufferedReader reader = new BufferedReader(new FileReader(modifiedFilePath))) {
-                        String line;
-                        while ((line = reader.readLine()) != null) {
-                            String[] parts = line.split("`", 2);
-                            if (parts.length == 2 && !parts[0].equals(slang)) {
-                                lines.add(line);
-                            }
-                        }
-                    } catch (IOException ex) {
-                        ex.printStackTrace();
-                    }
-
-                    // Write the updated contents back to the file
-                    try (FileWriter writer = new FileWriter(modifiedFilePath)) {
-                        for (String line : lines) {
-                            writer.write(line + "\n");
-                        }
-                    } catch (IOException ex) {
-                        ex.printStackTrace();
-                    }
-
-                    // Notify user of successful deletion with a nice confirmation dialog
-                    JOptionPane.showMessageDialog(this, "<html><b>Slang word <font color='green'>" + slang + "</font> deleted successfully!</b></html>",
-                            "Success", JOptionPane.INFORMATION_MESSAGE);
-                }
-            } else {
-                // If slang word doesn't exist, notify the user in a clearer way
-                JOptionPane.showMessageDialog(this, "<html><b>Slang word <font color='red'>" + slang + "</font> not found!</b></html>",
-                        "Error", JOptionPane.ERROR_MESSAGE);
-            }
-        }
-    }
-
-
-    private void resetDictionary() {
-        // Ask user for confirmation before resetting the dictionary
-        int confirmReset = JOptionPane.showConfirmDialog(this,
-                "<html><b>Are you sure you want to reset the dictionary to its original state?</b></html>",
-                "Confirm Reset", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
-
-        if (confirmReset == JOptionPane.YES_OPTION) {
-            try (BufferedReader reader = new BufferedReader(new FileReader(filePath));
-                 FileWriter writer = new FileWriter(modifiedFilePath)) {
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    writer.write(line + "\n");
-                }
-            } catch (IOException ex) {
-                ex.printStackTrace();
-            }
-
-            // Clear the current slangWords dictionary
-            slangWords.clear();
-
-            try {
-                // Load the slang words again after reset
-                loadSlangWords();
-            } catch (IOException ex) {
-                ex.printStackTrace();
-            }
-
-            // Update the word list display
-            String[] newWords = slangWords.keySet().toArray(new String[0]);
-            wordList.setListData(newWords);
-
-            // Clear the content area and search field
-            contentArea.setText("");
-            searchField.setText("");
-
-            // Notify user that the dictionary has been reset successfully
-            JOptionPane.showMessageDialog(this,
-                    "<html><b>Dictionary has been reset to its original state!</b></html>",
-                    "Reset Successful", JOptionPane.INFORMATION_MESSAGE);
-        } else {
-            // If user cancels the reset action
-            JOptionPane.showMessageDialog(this,
-                    "<html><b>Dictionary reset has been cancelled.</b></html>",
-                    "Reset Cancelled", JOptionPane.INFORMATION_MESSAGE);
-        }
-    }
 
 
     private void showRandomWord() {
