@@ -2,7 +2,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.Map;
 
-public class showRandomWord {
+public class showRandomWord extends Component {
     public showRandomWord(Map<String, String> slangWords) {
 // Select a random slang word from the dictionary
         int randomIndex = (int) (Math.random() * slangWords.size());

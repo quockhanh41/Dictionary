@@ -5,7 +5,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-public class startQuiz {
+public class startQuiz extends Component {
     public startQuiz(Map< String, String > slangWords) {
         // Select a random slang word from the dictionary
         int randomIndex = (int) (Math.random() * slangWords.size());
