@@ -161,14 +161,14 @@ public class DictionaryApp extends JFrame {
         quizButton.setBackground(new Color(46, 204, 113));
         quizButton.setForeground(Color.WHITE);
         quizButton.setFocusPainted(false);
-        quizButton.addActionListener(e -> startQuiz());
+        quizButton.addActionListener(e -> new startQuiz(slangWords));
 
         JButton slangQuizButton = new JButton("Take a Quiz with Slang Words");
         slangQuizButton.setFont(new Font("Arial", Font.BOLD, 16));
         slangQuizButton.setBackground(new Color(231, 76, 60));
         slangQuizButton.setForeground(Color.WHITE);
         slangQuizButton.setFocusPainted(false);
-        slangQuizButton.addActionListener(e -> startSlangQuiz());
+        slangQuizButton.addActionListener(e -> new startSlangQuiz(slangWords));
 
         JPanel buttonPanel = new JPanel(new GridLayout(1, 3, 20, 10));
         buttonPanel.add(randomButton);
@@ -258,150 +258,6 @@ public class DictionaryApp extends JFrame {
         reader.close();
     }
 
-
-
-
-
-
-    private void startQuiz() {
-        // Select a random slang word from the dictionary
-        int randomIndex = (int) (Math.random() * slangWords.size());
-        String randomSlang = slangWords.keySet().toArray(new String[0])[randomIndex];
-        String randomDefinition = slangWords.get(randomSlang);
-
-        // Prepare multiple random definitions (including the correct one)
-        List<String> randomDefinitions = new ArrayList<>();
-        randomDefinitions.add(randomDefinition);
-        while (randomDefinitions.size() < 4) {
-            int randomIndex2 = (int) (Math.random() * slangWords.size());
-            String randomDefinition2 = slangWords.get(slangWords.keySet().toArray(new String[0])[randomIndex2]);
-            if (!randomDefinitions.contains(randomDefinition2)) {
-                randomDefinitions.add(randomDefinition2);
-            }
-        }
-
-        // Shuffle the options to randomize the order of the answer choices
-        Collections.shuffle(randomDefinitions);
-
-        // Create a custom JPanel to display the question and options
-        JPanel quizPanel = new JPanel();
-        quizPanel.setLayout(new BoxLayout(quizPanel, BoxLayout.Y_AXIS));
-        quizPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20)); // Padding around the panel
-
-        // Question label
-        JLabel questionLabel = new JLabel("What is the definition of: " + randomSlang + "?");
-        questionLabel.setFont(new Font("Arial", Font.BOLD, 20));
-        questionLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-        quizPanel.add(questionLabel);
-
-        quizPanel.add(Box.createVerticalStrut(20));  // Space between question and options
-
-        // Option buttons with padding around each
-        List<JButton> optionButtons = new ArrayList<>();
-        for (String option : randomDefinitions) {
-            JButton optionButton = new JButton(option);
-            optionButton.setFont(new Font("Arial", Font.PLAIN, 16));
-            optionButton.setAlignmentX(Component.CENTER_ALIGNMENT);
-            optionButton.setPreferredSize(new Dimension(500, 40));
-
-            // Add padding to each button by setting margins
-            optionButton.setMargin(new Insets(10, 20, 10, 20)); // Top, Left, Bottom, Right padding
-
-            // Add action listener to handle answer selection
-            optionButton.addActionListener(event -> {
-                // Check if the selected answer is correct
-                if (option.equals(randomDefinition)) {
-                    optionButton.setBackground(Color.GREEN);
-
-                } else {
-                    optionButton.setBackground(Color.RED);  // Incorrect answer, red background
-                    optionButtons.stream().filter(button -> button.getText().equals(randomDefinition)).findFirst().ifPresent(button -> button.setBackground(Color.GREEN));
-                }
-                // Disable all options after an answer is selected
-                optionButtons.forEach(button -> button.setEnabled(false));
-            });
-
-            // Add the button to the panel
-            quizPanel.add(optionButton);
-            optionButtons.add(optionButton);
-
-            quizPanel.add(Box.createVerticalStrut(10));  // Add space between options
-        }
-        // Show the custom panel in a dialog box
-        JOptionPane.showConfirmDialog(this, quizPanel, "Slang Quiz", JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE);
-    }
-
-    private void startSlangQuiz() {
-        // Select a random definition from the dictionary
-        int randomIndex = (int) (Math.random() * slangWords.size());
-        String randomSlang = slangWords.keySet().toArray(new String[0])[randomIndex];
-        String randomDefinition = slangWords.get(randomSlang);
-
-        // Prepare 4 random slang words (including the correct one)
-        List<String> randomSlangs = new ArrayList<>();
-        randomSlangs.add(randomSlang);
-        while (randomSlangs.size() < 4) {
-            int randomIndex2 = (int) (Math.random() * slangWords.size());
-            String randomSlang2 = slangWords.keySet().toArray(new String[0])[randomIndex2];
-            if (!randomSlangs.contains(randomSlang2)) {
-                randomSlangs.add(randomSlang2);
-            }
-        }
-
-        // Shuffle the options to randomize the order of the slang words
-        Collections.shuffle(randomSlangs);
-
-        // Create a custom JPanel to display the question and options
-        JPanel quizPanel = new JPanel();
-        quizPanel.setLayout(new BoxLayout(quizPanel, BoxLayout.Y_AXIS));
-        quizPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20)); // Padding around the panel
-
-        // Question label
-        JLabel questionLabel = new JLabel("Which slang word means: " + randomDefinition + "?");
-        questionLabel.setFont(new Font("Arial", Font.BOLD, 20));
-        questionLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-        quizPanel.add(questionLabel);
-
-        quizPanel.add(Box.createVerticalStrut(20));  // Space between question and options
-
-        // Option buttons with padding around each
-        List<JButton> optionButtons = new ArrayList<>();
-        for (String option : randomSlangs) {
-            JButton optionButton = new JButton(option);
-            optionButton.setFont(new Font("Arial", Font.PLAIN, 16));
-            optionButton.setAlignmentX(Component.CENTER_ALIGNMENT);
-            optionButton.setPreferredSize(new Dimension(500, 40));
-
-            // Add padding to each button by setting margins
-            optionButton.setMargin(new Insets(10, 20, 10, 20)); // Top, Left, Bottom, Right padding
-
-            // Add action listener to handle answer selection
-            optionButton.addActionListener(event -> {
-                // Check if the selected answer is correct
-                if (option.equals(randomSlang)) {
-                    optionButton.setBackground(Color.GREEN); // Correct answer
-                } else {
-                    optionButton.setBackground(Color.RED);  // Incorrect answer, red background
-                    optionButtons.stream()
-                            .filter(button -> button.getText().equals(randomSlang))
-                            .findFirst()
-                            .ifPresent(button -> button.setBackground(Color.GREEN)); // Highlight correct answer
-                }
-
-                // Disable all options after an answer is selected
-                optionButtons.forEach(button -> button.setEnabled(false));
-            });
-
-            // Add the button to the panel
-            quizPanel.add(optionButton);
-            optionButtons.add(optionButton);
-
-            quizPanel.add(Box.createVerticalStrut(10));  // Add space between options
-        }
-
-        // Show the custom panel in a dialog box
-        JOptionPane.showConfirmDialog(this, quizPanel, "Slang Quiz", JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE);
-    }
 
     // Function to display history in the given JPanel (historyPanel)
     private void showSlangHistoryInPanel(JPanel historyPanel) {
