@@ -4,14 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6b04acd3-04cb-4df1-b963-6a4a6b055a18" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/src/deleteSlangWord.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/resetDictionary.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/history.txt" beforeDir="false" afterPath="$PROJECT_DIR$/history.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/modified_slang.txt" beforeDir="false" afterPath="$PROJECT_DIR$/modified_slang.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/DictionaryApp.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/DictionaryApp.java" afterDir="false" />
-    </list>
+    <list default="true" id="6b04acd3-04cb-4df1-b963-6a4a6b055a18" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -119,7 +112,7 @@
       <workItem from="1732631527300" duration="13162000" />
       <workItem from="1732782008424" duration="612000" />
       <workItem from="1732782743461" duration="1064000" />
-      <workItem from="1732817059263" duration="1184000" />
+      <workItem from="1732817059263" duration="1308000" />
     </task>
     <servers />
   </component>
