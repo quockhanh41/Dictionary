@@ -75,7 +75,7 @@ public class DictionaryApp extends JFrame {
         // add listener to run showSlangHistoryInPanel() when the History tab is selected
         tabbedPane.addChangeListener(e -> {
             if (tabbedPane.getSelectedIndex() == 2) {
-               new showSlangHistoryInPanel(historyPanel);
+                new showSlangHistoryInPanel(historyPanel);
             }
         });
         tabbedPane.addTab("History", historyPanel);
@@ -133,7 +133,7 @@ public class DictionaryApp extends JFrame {
         addButton.addActionListener(e -> new addSlangWord(slangWords, modifiedFilePath));
         editButton.addActionListener(e -> new editSlangWord(slangWords, modifiedFilePath));
         deleteButton.addActionListener(e -> new deleteSlangWord(slangWords, modifiedFilePath));
-        resetButton.addActionListener(e -> new resetDictionary( slangWords, wordList, contentArea, searchField, filePath, modifiedFilePath));
+        resetButton.addActionListener(e -> new resetDictionary(slangWords, wordList, contentArea, searchField, filePath, modifiedFilePath));
 
         buttonPanel.add(addButton);
         buttonPanel.add(editButton);
@@ -225,13 +225,17 @@ public class DictionaryApp extends JFrame {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-        if (!slang.isEmpty()) {
+        if (!slang.isEmpty() && !definition.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Please enter only one search criteria.");
+        }
+       else if (!slang.isEmpty()) {
             String result = slangWords.getOrDefault(slang, "Not found.");
             contentArea.setText(result);
+
         } else if (!definition.isEmpty()) {
             List<String> results = searchByDefinition(definition);
             wordList.setListData(results.toArray(new String[0]));
+            contentArea.setText("");
         }
     }
 
